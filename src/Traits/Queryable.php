@@ -56,6 +56,13 @@ trait Queryable
     protected $withCount = [];
 
     /**
+     * Array of "global scopes" to exclude
+     *
+     * @var array
+     */
+    protected $withoutGlobalScopes = [];
+
+    /**
      * Soft query delete handle
      *
      * @var int
@@ -172,6 +179,19 @@ trait Queryable
     public function with(array $with): BaseRepositoryInterface
     {
         $this->with = $with;
+
+        return $this;
+    }
+
+    /**
+     * Set global scopes to include
+     *
+     * @param array $withoutGlobalScopes
+     * @return BaseRepositoryInterface
+     */
+    public function withoutGlobalScopes(array $withoutGlobalScopes): BaseRepositoryInterface
+    {
+        $this->withoutGlobalScopes = $withoutGlobalScopes;
 
         return $this;
     }
@@ -350,6 +370,9 @@ trait Queryable
             : $model->query();
 
         return $query
+            ->when(!empty($this->withoutGlobalScopes), function (Builder $query) {
+                $query->withoutGlobalScopes($this->withoutGlobalScopes);
+            })
             ->when(!empty($this->with), function (Builder $query) {
                 $query->with($this->with);
             })
@@ -375,7 +398,6 @@ trait Queryable
                         ->when($mode === self::$ONLY_DELETED, function (Builder $query) {
                             $query->whereNotNull($this->deletedAtColumnName);
                         });
-
                 });
     }
 
