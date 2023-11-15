@@ -15,9 +15,9 @@ use Adobrovolsky97\LaravelRepositoryServicePattern\Exceptions\Repository\Reposit
 use Adobrovolsky97\LaravelRepositoryServicePattern\Repositories\Contracts\BaseCachableRepositoryInterface;
 
 /**
- * Class BaseCachableRepository
+ * Class BaseCacheableRepository
  */
-abstract class BaseCachableRepository extends BaseRepository implements BaseCachableRepositoryInterface
+abstract class BaseCacheableRepository extends BaseRepository implements BaseCachableRepositoryInterface
 {
     /**
      * Keys
@@ -196,7 +196,7 @@ abstract class BaseCachableRepository extends BaseRepository implements BaseCach
      */
     public function insert(array $data): bool
     {
-        $this->flushListsCache();
+        $this->flushListsCaches();
 
         return parent::insert($data);
     }
@@ -213,7 +213,7 @@ abstract class BaseCachableRepository extends BaseRepository implements BaseCach
         $model = parent::create($data);
 
         $this->cacheModel($model);
-        $this->flushListsCache();
+        $this->flushListsCaches();
 
         return $model;
     }
@@ -231,7 +231,7 @@ abstract class BaseCachableRepository extends BaseRepository implements BaseCach
         $model = parent::update($keyOrModel, $data);
 
         $this->cacheModel($model);
-        $this->flushListsCache();
+        $this->flushListsCaches();
 
         return $model;
     }
@@ -249,7 +249,7 @@ abstract class BaseCachableRepository extends BaseRepository implements BaseCach
         $model = parent::updateOrCreate($attributes, $data);
 
         $this->cacheModel($model);
-        $this->flushListsCache();
+        $this->flushListsCaches();
 
         return $model;
     }
@@ -266,7 +266,7 @@ abstract class BaseCachableRepository extends BaseRepository implements BaseCach
         $model = $this->resolveModel($keyOrModel);
 
         $this->cacheDriver->forget($this->generateCacheKeyForModelInstance($model->getKey()));
-        $this->flushListsCache();
+        $this->flushListsCaches();
 
         return parent::delete($model);
     }
@@ -283,7 +283,7 @@ abstract class BaseCachableRepository extends BaseRepository implements BaseCach
         $model = $this->resolveModel($keyOrModel);
         parent::softDelete($model);
 
-        $this->flushListsCache();
+        $this->flushListsCaches();
         $this->cacheDriver->forget($this->generateCacheKeyForModelInstance($model->getKey()));
     }
 
@@ -299,7 +299,19 @@ abstract class BaseCachableRepository extends BaseRepository implements BaseCach
         parent::restore($keyOrModel);
 
         $this->cacheModel($keyOrModel);
-        $this->flushListsCache();
+        $this->flushListsCaches();
+    }
+
+    /**
+     * Clear get all & paginated cache keys
+     *
+     * @return void
+     */
+    public function flushListsCaches(): void
+    {
+        $this->cacheDriver->forget($this->generateCacheKey(self::KEY_ALL));
+        $this->cacheDriver->forget($this->generateCacheKey(self::KEY_PAGINATED));
+        $this->cacheDriver->forget($this->generateCacheKey(self::KEY_CURSOR));
     }
 
     /**
@@ -318,18 +330,6 @@ abstract class BaseCachableRepository extends BaseRepository implements BaseCach
             'keyWithTag' => ($this->cacheAlias ?? Str::camel(last(explode('\\', $this->getModelClass())))) . '.' . $keyName . (!empty($params) ? '.' . md5(json_encode($params)) : ''),
             'paramsKey'  => (!empty($params) ? md5(json_encode($params)) : '')
         ];
-    }
-
-    /**
-     * Clear get all & paginated cache keys
-     *
-     * @return void
-     */
-    protected function flushListsCache(): void
-    {
-        $this->cacheDriver->forget($this->generateCacheKey(self::KEY_ALL));
-        $this->cacheDriver->forget($this->generateCacheKey(self::KEY_PAGINATED));
-        $this->cacheDriver->forget($this->generateCacheKey(self::KEY_CURSOR));
     }
 
     /**

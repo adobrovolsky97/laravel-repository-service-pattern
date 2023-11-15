@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Cache;
 use Adobrovolsky97\LaravelRepositoryServicePattern\Exceptions\Repository\RepositoryException;
-use Adobrovolsky97\LaravelRepositoryServicePattern\Repositories\BaseCachableRepository;
+use Adobrovolsky97\LaravelRepositoryServicePattern\Repositories\BaseCacheableRepository;
 use Adobrovolsky97\LaravelRepositoryServicePattern\Tests\TestCase;
 
 /**
@@ -29,7 +29,7 @@ class BaseCacheableRepositoryTest extends TestCase
         $collection = $this->repository->getAll($searchParams);
 
         $cacheKey = $this->repository->generateCacheKey(
-            BaseCachableRepository::KEY_ALL,
+            BaseCacheableRepository::KEY_ALL,
             array_merge(
                 $searchParams,
                 ['with' => [], 'withCount' => [], 'softDeleteQueryMode' => null]
@@ -41,7 +41,7 @@ class BaseCacheableRepositoryTest extends TestCase
 
         $collection = $this->repository->getAll($searchParams);
         $anotherCacheKey = $this->repository->generateCacheKey(
-            BaseCachableRepository::KEY_ALL,
+            BaseCacheableRepository::KEY_ALL,
             array_merge(
                 $searchParams,
                 ['with' => [], 'withCount' => [], 'softDeleteQueryMode' => null]
@@ -66,7 +66,7 @@ class BaseCacheableRepositoryTest extends TestCase
         $collection = $this->repository->getAllPaginated($searchParams);
 
         $cacheKey = $this->repository->generateCacheKey(
-            BaseCachableRepository::KEY_PAGINATED,
+            BaseCacheableRepository::KEY_PAGINATED,
             array_merge(
                 $searchParams,
                 ['with' => [], 'withCount' => [], 'softDeleteQueryMode' => null]
@@ -79,7 +79,7 @@ class BaseCacheableRepositoryTest extends TestCase
 
         $collection = $this->repository->getAllPaginated($searchParams);
         $anotherCacheKey = $this->repository->generateCacheKey(
-            BaseCachableRepository::KEY_PAGINATED,
+            BaseCacheableRepository::KEY_PAGINATED,
             array_merge(
                 $searchParams,
                 ['with' => [], 'withCount' => [], 'softDeleteQueryMode' => null]
@@ -151,9 +151,9 @@ class BaseCacheableRepositoryTest extends TestCase
      */
     public function testInsert(): void
     {
-        $cacheKeyForPaginated = $this->repository->generateCacheKey(BaseCachableRepository::KEY_PAGINATED, []);
-        $cacheKeyForAll = $this->repository->generateCacheKey(BaseCachableRepository::KEY_ALL, []);
-        $cacheKeyForCursor = $this->repository->generateCacheKey(BaseCachableRepository::KEY_CURSOR, []);
+        $cacheKeyForPaginated = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_PAGINATED, []);
+        $cacheKeyForAll = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_ALL, []);
+        $cacheKeyForCursor = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_CURSOR, []);
 
         Cache::tags($cacheKeyForPaginated['tags'])->put('', 'test');
         Cache::tags($cacheKeyForAll['tags'])->put('', 'test');
@@ -184,9 +184,9 @@ class BaseCacheableRepositoryTest extends TestCase
      */
     public function testCreate(): void
     {
-        $cacheKeyForPaginated = $this->repository->generateCacheKey(BaseCachableRepository::KEY_PAGINATED, []);
-        $cacheKeyForAll = $this->repository->generateCacheKey(BaseCachableRepository::KEY_ALL, []);
-        $cacheKeyForCursor = $this->repository->generateCacheKey(BaseCachableRepository::KEY_CURSOR, []);
+        $cacheKeyForPaginated = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_PAGINATED, []);
+        $cacheKeyForAll = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_ALL, []);
+        $cacheKeyForCursor = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_CURSOR, []);
 
         Cache::tags($cacheKeyForPaginated['tags'])->put('', 'test');
         Cache::tags($cacheKeyForAll['tags'])->put('', 'test');
@@ -208,9 +208,9 @@ class BaseCacheableRepositoryTest extends TestCase
      */
     public function testUpdate(): void
     {
-        $cacheKeyForPaginated = $this->repository->generateCacheKey(BaseCachableRepository::KEY_PAGINATED, []);
-        $cacheKeyForAll = $this->repository->generateCacheKey(BaseCachableRepository::KEY_ALL, []);
-        $cacheKeyForCursor = $this->repository->generateCacheKey(BaseCachableRepository::KEY_CURSOR, []);
+        $cacheKeyForPaginated = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_PAGINATED, []);
+        $cacheKeyForAll = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_ALL, []);
+        $cacheKeyForCursor = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_CURSOR, []);
 
         Cache::tags($cacheKeyForPaginated['tags'])->put('', 'test');
         Cache::tags($cacheKeyForAll['tags'])->put('', 'test');
@@ -234,9 +234,9 @@ class BaseCacheableRepositoryTest extends TestCase
      */
     public function testUpdateOrCreate(): void
     {
-        $cacheKeyForPaginated = $this->repository->generateCacheKey(BaseCachableRepository::KEY_PAGINATED, []);
-        $cacheKeyForAll = $this->repository->generateCacheKey(BaseCachableRepository::KEY_ALL, []);
-        $cacheKeyForCursor = $this->repository->generateCacheKey(BaseCachableRepository::KEY_CURSOR, []);
+        $cacheKeyForPaginated = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_PAGINATED, []);
+        $cacheKeyForAll = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_ALL, []);
+        $cacheKeyForCursor = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_CURSOR, []);
 
         Cache::tags($cacheKeyForPaginated['tags'])->put('', 'test');
         Cache::tags($cacheKeyForAll['tags'])->put('', 'test');
@@ -261,9 +261,9 @@ class BaseCacheableRepositoryTest extends TestCase
      */
     public function testDelete(): void
     {
-        $cacheKeyForPaginated = $this->repository->generateCacheKey(BaseCachableRepository::KEY_PAGINATED, []);
-        $cacheKeyForAll = $this->repository->generateCacheKey(BaseCachableRepository::KEY_ALL, []);
-        $cacheKeyForCursor = $this->repository->generateCacheKey(BaseCachableRepository::KEY_CURSOR, []);
+        $cacheKeyForPaginated = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_PAGINATED, []);
+        $cacheKeyForAll = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_ALL, []);
+        $cacheKeyForCursor = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_CURSOR, []);
 
         Cache::tags($cacheKeyForPaginated['tags'])->put('', 'test');
         Cache::tags($cacheKeyForAll['tags'])->put('', 'test');
@@ -290,9 +290,9 @@ class BaseCacheableRepositoryTest extends TestCase
      */
     public function testSoftDelete(): void
     {
-        $cacheKeyForPaginated = $this->repository->generateCacheKey(BaseCachableRepository::KEY_PAGINATED, []);
-        $cacheKeyForAll = $this->repository->generateCacheKey(BaseCachableRepository::KEY_ALL, []);
-        $cacheKeyForCursor = $this->repository->generateCacheKey(BaseCachableRepository::KEY_CURSOR, []);
+        $cacheKeyForPaginated = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_PAGINATED, []);
+        $cacheKeyForAll = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_ALL, []);
+        $cacheKeyForCursor = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_CURSOR, []);
 
         Cache::tags($cacheKeyForPaginated['tags'])->put('', 'test');
         Cache::tags($cacheKeyForAll['tags'])->put('', 'test');
@@ -319,9 +319,9 @@ class BaseCacheableRepositoryTest extends TestCase
      */
     public function testRestore(): void
     {
-        $cacheKeyForPaginated = $this->repository->generateCacheKey(BaseCachableRepository::KEY_PAGINATED, []);
-        $cacheKeyForAll = $this->repository->generateCacheKey(BaseCachableRepository::KEY_ALL, []);
-        $cacheKeyForCursor = $this->repository->generateCacheKey(BaseCachableRepository::KEY_CURSOR, []);
+        $cacheKeyForPaginated = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_PAGINATED, []);
+        $cacheKeyForAll = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_ALL, []);
+        $cacheKeyForCursor = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_CURSOR, []);
 
         Cache::tags($cacheKeyForPaginated['tags'])->put('', 'test');
         Cache::tags($cacheKeyForAll['tags'])->put('', 'test');
@@ -351,7 +351,7 @@ class BaseCacheableRepositoryTest extends TestCase
         $collection = $this->repository->onlyTrashed()->getAll();
 
         $onlyTrashedCacheKey = $this->repository->generateCacheKey(
-            BaseCachableRepository::KEY_ALL,
+            BaseCacheableRepository::KEY_ALL,
             array_merge(
                 [],
                 ['with' => [], 'withCount' => [], 'softDeleteQueryMode' => 3]
@@ -363,7 +363,7 @@ class BaseCacheableRepositoryTest extends TestCase
         $collection = $this->repository->withoutTrashed()->getAll();
 
         $withoutTrashedCacheKey = $this->repository->generateCacheKey(
-            BaseCachableRepository::KEY_ALL,
+            BaseCacheableRepository::KEY_ALL,
             array_merge(
                 [],
                 ['with' => [], 'withCount' => [], 'softDeleteQueryMode' => 1]
@@ -376,7 +376,7 @@ class BaseCacheableRepositoryTest extends TestCase
         $collection = $this->repository->withTrashed()->getAll();
 
         $withTrashedCacheKey = $this->repository->generateCacheKey(
-            BaseCachableRepository::KEY_ALL,
+            BaseCacheableRepository::KEY_ALL,
             array_merge(
                 [],
                 ['with' => [], 'withCount' => [], 'softDeleteQueryMode' => 2]
@@ -402,7 +402,7 @@ class BaseCacheableRepositoryTest extends TestCase
     {
         $model = $this->model;
 
-        $this->repository = new class($model) extends BaseCachableRepository {
+        $this->repository = new class($model) extends BaseCacheableRepository {
             public $cacheAlias = 'test';
             protected $modelClass;
 
