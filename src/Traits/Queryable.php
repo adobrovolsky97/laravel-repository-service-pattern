@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\LazyCollection;
 use Adobrovolsky97\LaravelRepositoryServicePattern\Exceptions\Repository\RepositoryException;
 use Adobrovolsky97\LaravelRepositoryServicePattern\Models\BaseModel;
@@ -274,7 +275,7 @@ trait Queryable
     {
         $query = $this->getQuery();
 
-        if (empty($conditions)) {
+        if (empty($conditions) || !Schema::hasColumn($query->getModel()->getTable(), key($conditions))) {
             return $query;
         }
 
