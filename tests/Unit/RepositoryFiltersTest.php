@@ -17,6 +17,15 @@ use Adobrovolsky97\LaravelRepositoryServicePattern\Tests\TestCase;
 class RepositoryFiltersTest extends TestCase
 {
     /**
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Schema::shouldReceive('hasColumn')->andReturn(true);
+    }
+
+    /**
      * Test applyFilterConditions()
      *
      * @param array $testTableData
