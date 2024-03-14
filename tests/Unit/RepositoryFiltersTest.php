@@ -17,6 +17,15 @@ use Adobrovolsky97\LaravelRepositoryServicePattern\Tests\TestCase;
 class RepositoryFiltersTest extends TestCase
 {
     /**
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Schema::shouldReceive('hasColumn')->andReturn(true);
+    }
+
+    /**
      * Test applyFilterConditions()
      *
      * @param array $testTableData
@@ -31,7 +40,6 @@ class RepositoryFiltersTest extends TestCase
         $this->createModel([]);
         $relatedId = DB::table('relations')->insertGetId(['property' => $propertyVal]);
         $model = $this->createModel(array_merge($testTableData, ['related_id' => $relatedId]));
-
 
         $collection = $this->repository->findMany($search);
         $this->assertCount(1, $collection);
