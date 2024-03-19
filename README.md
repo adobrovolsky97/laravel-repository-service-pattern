@@ -343,7 +343,7 @@ $posts = $this->repository->findMany([
 
 ### Caching
 
-If you want to apply caching to your models - extend your entity repository with the 
+If you want to apply caching to your models - extend your entity repository with the `BaseCacheableRepository.php`
 
 ### Code Generator
 
