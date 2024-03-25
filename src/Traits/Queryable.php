@@ -275,7 +275,7 @@ trait Queryable
     {
         $query = $this->getQuery();
 
-        if (empty($conditions) || !Schema::hasColumn($query->getModel()->getTable(), key($conditions))) {
+        if (empty($conditions)) {
             return $query;
         }
 
@@ -284,6 +284,10 @@ trait Queryable
         foreach ($conditions as $data) {
 
             list ($field, $operator, $val) = $data;
+
+            if (!Schema::hasColumn($query->getModel()->getTable(), $field)) {
+                continue;
+            }
 
             $operator = preg_replace('/\s\s+/', ' ', trim($operator));
 
