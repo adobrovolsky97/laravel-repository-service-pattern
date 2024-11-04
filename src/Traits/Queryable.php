@@ -285,7 +285,9 @@ trait Queryable
 
             list ($field, $operator, $val) = $data;
 
-            if (!Schema::hasColumn($query->getModel()->getTable(), $field)) {
+            $tableName = $query->getModel()->getTable();
+
+            if (!Schema::hasColumn($tableName, $field)) {
                 continue;
             }
 
@@ -297,30 +299,30 @@ trait Queryable
 
             switch (strtoupper($condition)) {
                 case 'NULL':
-                    $query->whereNull($field);
+                    $query->whereNull($tableName . '.' . $field);
                     break;
                 case 'NOT_NULL':
-                    $query->whereNotNull($field);
+                    $query->whereNotNull($tableName . '.' . $field);
                     break;
                 case 'IN':
                     $this->validateArrayData($val);
-                    $query->whereIn($field, $val);
+                    $query->whereIn($tableName . '.' . $field, $val);
                     break;
                 case 'NOT_IN':
                     $this->validateArrayData($val);
-                    $query->whereNotIn($field, $val);
+                    $query->whereNotIn($tableName . '.' . $field, $val);
                     break;
                 case 'DATE':
-                    $query->whereDate($field, $operator, $val);
+                    $query->whereDate($tableName . '.' . $field, $operator, $val);
                     break;
                 case 'DAY':
-                    $query->whereDay($field, $operator, $val);
+                    $query->whereDay($tableName . '.' . $field, $operator, $val);
                     break;
                 case 'MONTH':
-                    $query->whereMonth($field, $operator, $val);
+                    $query->whereMonth($tableName . '.' . $field, $operator, $val);
                     break;
                 case 'YEAR':
-                    $query->whereYear($field, $operator, $val);
+                    $query->whereYear($tableName . '.' . $field, $operator, $val);
                     break;
                 case 'HAS':
                     $this->validateClosureFunction($val);
@@ -340,22 +342,22 @@ trait Queryable
                     break;
                 case 'BETWEEN':
                     $this->validateArrayData($val);
-                    $query->whereBetween($field, $val);
+                    $query->whereBetween($tableName . '.' . $field, $val);
                     break;
                 case 'BETWEEN_COLUMNS':
                     $this->validateArrayData($val);
-                    $query->whereBetweenColumns($field, $val);
+                    $query->whereBetweenColumns($tableName . '.' . $field, $val);
                     break;
                 case 'NOT_BETWEEN':
                     $this->validateArrayData($val);
-                    $query->whereNotBetween($field, $val);
+                    $query->whereNotBetween($tableName . '.' . $field, $val);
                     break;
                 case 'NOT_BETWEEN_COLUMNS':
                     $this->validateArrayData($val);
-                    $query->whereNotBetweenColumns($field, $val);
+                    $query->whereNotBetweenColumns($tableName . '.' . $field, $val);
                     break;
                 default:
-                    $query->where($field, $condition, $val);
+                    $query->where($tableName . '.' . $field, $condition, $val);
             }
         }
 
