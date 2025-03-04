@@ -280,14 +280,14 @@ trait Queryable
         }
 
         $conditions = $this->parseConditions($conditions);
+        $tableName = $query->getModel()->getTable();
+        $tableColumns = $this->getTableColumns($tableName);
 
         foreach ($conditions as $data) {
 
             list ($field, $operator, $val) = $data;
 
-            $tableName = $query->getModel()->getTable();
-
-            if (!Schema::hasColumn($tableName, $field)) {
+            if (!in_array($field, $tableColumns)) {
                 continue;
             }
 
@@ -479,5 +479,22 @@ trait Queryable
         if (!$value instanceof Closure && !is_null($value)) {
             throw new RepositoryException("Invalid closure provided.");
         }
+    }
+
+    /**
+     * Get the columns for the model's table.
+     *
+     * @param string $tableName
+     * @return array
+     */
+    protected function getTableColumns(string $tableName): array
+    {
+        static $schemaCache = [];
+
+        if (!isset($schemaCache[$tableName])) {
+            $schemaCache[$tableName] = Schema::getColumnListing($tableName);
+        }
+
+        return $schemaCache[$tableName];
     }
 }
