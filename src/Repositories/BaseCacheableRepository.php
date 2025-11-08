@@ -123,23 +123,7 @@ abstract class BaseCacheableRepository extends BaseRepository implements BaseCac
      */
     public function getAllCursor(array $search = []): LazyCollection
     {
-        return $this->cacheDriver->remember(
-            $this->generateCacheKey(
-                self::KEY_CURSOR,
-                array_merge(
-                    $search,
-                    [
-                        'with'                => $this->with,
-                        'withCount'           => $this->withCount,
-                        'softDeleteQueryMode' => $this->softDeleteQueryMode
-                    ]
-                )
-            ),
-            $this->getTtl(),
-            function () use ($search) {
-                return parent::getAllCursor($search);
-            }
-        );
+        return parent::getAllCursor($search);
     }
 
     /**
@@ -332,7 +316,7 @@ abstract class BaseCacheableRepository extends BaseRepository implements BaseCac
         return [
             'tags'       => [$this->cacheAlias . '.' . $keyName],
             'keyWithTag' => ($this->cacheAlias ?? Str::camel(last(explode('\\', $this->getModelClass())))) . '.' . $keyName . (!empty($params) ? '.' . md5(json_encode($params)) : ''),
-            'paramsKey'  => (!empty($params) ? md5(json_encode($params)) : '')
+            'paramsKey'  => (!empty($params) ? md5(serialize($params)) : '')
         ];
     }
 
