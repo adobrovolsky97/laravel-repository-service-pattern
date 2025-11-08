@@ -287,6 +287,29 @@ trait Queryable
 
             list ($field, $operator, $val) = $data;
 
+            $relationConditions = ['HAS', 'DOESNT_HAVE', 'HAS_MORPH', 'DOESNT_HAVE_MORPH'];
+
+            if (in_array(strtoupper($operator), $relationConditions)) {
+                $this->validateClosureFunction($val);
+
+                switch (strtoupper($operator)) {
+                    case 'HAS':
+                        $query->whereHas($field, $val);
+                        break;
+                    case 'DOESNT_HAVE':
+                        $query->whereDoesntHave($field, $val);
+                        break;
+                    case 'HAS_MORPH':
+                        $query->whereHasMorph($field, $val);
+                        break;
+                    case 'DOESNT_HAVE_MORPH':
+                        $query->whereDoesntHaveMorph($field, $val);
+                        break;
+                }
+
+                continue;
+            }
+
             if (!in_array($field, $tableColumns)) {
                 continue;
             }
@@ -323,22 +346,6 @@ trait Queryable
                     break;
                 case 'YEAR':
                     $query->whereYear($tableName . '.' . $field, $operator, $val);
-                    break;
-                case 'HAS':
-                    $this->validateClosureFunction($val);
-                    $query->whereHas($field, $val);
-                    break;
-                case 'DOESNT_HAVE':
-                    $this->validateClosureFunction($val);
-                    $query->whereDoesntHave($field, $val);
-                    break;
-                case 'HAS_MORPH':
-                    $this->validateClosureFunction($val);
-                    $query->whereHasMorph($field, $val);
-                    break;
-                case 'DOESNT_HAVE_MORPH':
-                    $this->validateClosureFunction($val);
-                    $query->whereDoesntHaveMorph($field, $val);
                     break;
                 case 'BETWEEN':
                     $this->validateArrayData($val);

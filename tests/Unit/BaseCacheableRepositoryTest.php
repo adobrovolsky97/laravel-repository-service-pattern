@@ -69,7 +69,7 @@ class BaseCacheableRepositoryTest extends TestCase
             BaseCacheableRepository::KEY_PAGINATED,
             array_merge(
                 $searchParams,
-                ['with' => [], 'withCount' => [], 'softDeleteQueryMode' => null]
+                ['with' => [], 'withCount' => [], 'softDeleteQueryMode' => null, 'pageSize' => 15, 'page' => 1]
             )
         );
 
@@ -82,7 +82,7 @@ class BaseCacheableRepositoryTest extends TestCase
             BaseCacheableRepository::KEY_PAGINATED,
             array_merge(
                 $searchParams,
-                ['with' => [], 'withCount' => [], 'softDeleteQueryMode' => null]
+                ['with' => [], 'withCount' => [], 'softDeleteQueryMode' => null, 'pageSize' => 15, 'page' => 1]
             )
         );
 

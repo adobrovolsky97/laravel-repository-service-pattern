@@ -103,6 +103,11 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
                 $this->modelClass = get_class($model);
             }
 
+            protected function getTableColumns(string $tableName): array
+            {
+                return Schema::getColumnListing($tableName);
+            }
+
             protected function getModelClass(): string
             {
                 return $this->modelClass;

@@ -22,7 +22,6 @@ class RepositoryFiltersTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        Schema::shouldReceive('hasColumn')->andReturn(true);
     }
 
     /**
@@ -37,10 +36,11 @@ class RepositoryFiltersTest extends TestCase
      */
     public function testQueryModelQuery(array $testTableData, string $propertyVal, array $search): void
     {
+        Schema::shouldReceive('getColumnListing')->andReturn(array_keys($testTableData));
+
         $this->createModel([]);
         $relatedId = DB::table('relations')->insertGetId(['property' => $propertyVal]);
         $model = $this->createModel(array_merge($testTableData, ['related_id' => $relatedId]));
-
 
         $collection = $this->repository->findMany($search);
         $this->assertCount(1, $collection);

@@ -34,7 +34,6 @@ class BaseCrudServiceTest extends TestCase
         parent::setUp();
 
         $this->initializeService();
-        Schema::shouldReceive('hasColumn')->andReturn(true);
     }
 
     /**

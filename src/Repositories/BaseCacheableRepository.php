@@ -91,6 +91,8 @@ abstract class BaseCacheableRepository extends BaseRepository implements BaseCac
      */
     public function getAllPaginated(array $search = [], int $pageSize = 15): LengthAwarePaginator
     {
+        $page = request()?->input('page', 1) ?? 1;
+
         return $this->cacheDriver->remember(
             $this->generateCacheKey(
                 self::KEY_PAGINATED,
@@ -99,7 +101,9 @@ abstract class BaseCacheableRepository extends BaseRepository implements BaseCac
                     [
                         'with'                => $this->with,
                         'withCount'           => $this->withCount,
-                        'softDeleteQueryMode' => $this->softDeleteQueryMode
+                        'softDeleteQueryMode' => $this->softDeleteQueryMode,
+                        'pageSize'            => $pageSize,
+                        'page'                => $page,
                     ]
                 )
             ),
