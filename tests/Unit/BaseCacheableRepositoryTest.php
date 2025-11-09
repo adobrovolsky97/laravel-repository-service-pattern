@@ -153,7 +153,6 @@ class BaseCacheableRepositoryTest extends TestCase
     {
         $cacheKeyForPaginated = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_PAGINATED, []);
         $cacheKeyForAll = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_ALL, []);
-        $cacheKeyForCursor = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_CURSOR, []);
 
         Cache::tags($cacheKeyForPaginated['tags'])->put('', 'test');
         Cache::tags($cacheKeyForAll['tags'])->put('', 'test');
@@ -174,7 +173,6 @@ class BaseCacheableRepositoryTest extends TestCase
 
         $this->assertNull($this->getCachedValue($cacheKeyForPaginated));
         $this->assertNull($this->getCachedValue($cacheKeyForAll));
-        $this->assertNull($this->getCachedValue($cacheKeyForCursor));
     }
 
     /**
@@ -186,7 +184,6 @@ class BaseCacheableRepositoryTest extends TestCase
     {
         $cacheKeyForPaginated = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_PAGINATED, []);
         $cacheKeyForAll = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_ALL, []);
-        $cacheKeyForCursor = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_CURSOR, []);
 
         Cache::tags($cacheKeyForPaginated['tags'])->put('', 'test');
         Cache::tags($cacheKeyForAll['tags'])->put('', 'test');
@@ -197,7 +194,6 @@ class BaseCacheableRepositoryTest extends TestCase
 
         $this->assertNull($this->getCachedValue($cacheKeyForPaginated));
         $this->assertNull($this->getCachedValue($cacheKeyForAll));
-        $this->assertNull($this->getCachedValue($cacheKeyForCursor));
     }
 
     /**
@@ -210,7 +206,6 @@ class BaseCacheableRepositoryTest extends TestCase
     {
         $cacheKeyForPaginated = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_PAGINATED, []);
         $cacheKeyForAll = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_ALL, []);
-        $cacheKeyForCursor = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_CURSOR, []);
 
         Cache::tags($cacheKeyForPaginated['tags'])->put('', 'test');
         Cache::tags($cacheKeyForAll['tags'])->put('', 'test');
@@ -223,7 +218,6 @@ class BaseCacheableRepositoryTest extends TestCase
 
         $this->assertNull($this->getCachedValue($cacheKeyForPaginated));
         $this->assertNull($this->getCachedValue($cacheKeyForAll));
-        $this->assertNull($this->getCachedValue($cacheKeyForCursor));
     }
 
     /**
@@ -236,7 +230,6 @@ class BaseCacheableRepositoryTest extends TestCase
     {
         $cacheKeyForPaginated = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_PAGINATED, []);
         $cacheKeyForAll = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_ALL, []);
-        $cacheKeyForCursor = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_CURSOR, []);
 
         Cache::tags($cacheKeyForPaginated['tags'])->put('', 'test');
         Cache::tags($cacheKeyForAll['tags'])->put('', 'test');
@@ -250,7 +243,6 @@ class BaseCacheableRepositoryTest extends TestCase
 
         $this->assertNull($this->getCachedValue($cacheKeyForPaginated));
         $this->assertNull($this->getCachedValue($cacheKeyForAll));
-        $this->assertNull($this->getCachedValue($cacheKeyForCursor));
     }
 
     /**
@@ -263,7 +255,6 @@ class BaseCacheableRepositoryTest extends TestCase
     {
         $cacheKeyForPaginated = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_PAGINATED, []);
         $cacheKeyForAll = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_ALL, []);
-        $cacheKeyForCursor = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_CURSOR, []);
 
         Cache::tags($cacheKeyForPaginated['tags'])->put('', 'test');
         Cache::tags($cacheKeyForAll['tags'])->put('', 'test');
@@ -278,7 +269,6 @@ class BaseCacheableRepositoryTest extends TestCase
 
         $this->assertNull($this->getCachedValue($cacheKeyForPaginated));
         $this->assertNull($this->getCachedValue($cacheKeyForAll));
-        $this->assertNull($this->getCachedValue($cacheKeyForCursor));
         $this->assertNull($this->getCachedValue($modelCacheKey));
     }
 
@@ -292,7 +282,6 @@ class BaseCacheableRepositoryTest extends TestCase
     {
         $cacheKeyForPaginated = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_PAGINATED, []);
         $cacheKeyForAll = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_ALL, []);
-        $cacheKeyForCursor = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_CURSOR, []);
 
         Cache::tags($cacheKeyForPaginated['tags'])->put('', 'test');
         Cache::tags($cacheKeyForAll['tags'])->put('', 'test');
@@ -307,7 +296,6 @@ class BaseCacheableRepositoryTest extends TestCase
 
         $this->assertNull($this->getCachedValue($cacheKeyForPaginated));
         $this->assertNull($this->getCachedValue($cacheKeyForAll));
-        $this->assertNull($this->getCachedValue($cacheKeyForCursor));
         $this->assertNull($this->getCachedValue($modelCacheKey));
     }
 
@@ -321,7 +309,6 @@ class BaseCacheableRepositoryTest extends TestCase
     {
         $cacheKeyForPaginated = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_PAGINATED, []);
         $cacheKeyForAll = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_ALL, []);
-        $cacheKeyForCursor = $this->repository->generateCacheKey(BaseCacheableRepository::KEY_CURSOR, []);
 
         Cache::tags($cacheKeyForPaginated['tags'])->put('', 'test');
         Cache::tags($cacheKeyForAll['tags'])->put('', 'test');
@@ -336,7 +323,6 @@ class BaseCacheableRepositoryTest extends TestCase
 
         $this->assertNull($this->getCachedValue($cacheKeyForPaginated));
         $this->assertNull($this->getCachedValue($cacheKeyForAll));
-        $this->assertNull($this->getCachedValue($cacheKeyForCursor));
         $this->assertEquals($model->refresh(), $this->getCachedValue($modelCacheKey));
     }
 

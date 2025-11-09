@@ -26,7 +26,6 @@ abstract class BaseCacheableRepository extends BaseRepository implements BaseCac
      */
     public const KEY_ALL = 'all';
     public const KEY_PAGINATED = 'paginated';
-    public const KEY_CURSOR = 'cursor';
 
     /**
      * @var BaseCacheDriver
@@ -91,7 +90,7 @@ abstract class BaseCacheableRepository extends BaseRepository implements BaseCac
      */
     public function getAllPaginated(array $search = [], int $pageSize = 15): LengthAwarePaginator
     {
-        $page = request()?->input('page', 1) ?? 1;
+        $page = $search['page'] ?? (request()?->input('page', 1) ?? 1);
 
         return $this->cacheDriver->remember(
             $this->generateCacheKey(
@@ -108,8 +107,9 @@ abstract class BaseCacheableRepository extends BaseRepository implements BaseCac
                 )
             ),
             $this->getTtl(),
-            function () use ($search) {
-                return parent::getAllPaginated($search);
+            function () use ($search, $pageSize, $page) {
+                $search['page'] = $page;
+                return parent::getAllPaginated($search, $pageSize);
             }
         );
     }
@@ -299,7 +299,6 @@ abstract class BaseCacheableRepository extends BaseRepository implements BaseCac
     {
         $this->cacheDriver->forget($this->generateCacheKey(self::KEY_ALL));
         $this->cacheDriver->forget($this->generateCacheKey(self::KEY_PAGINATED));
-        $this->cacheDriver->forget($this->generateCacheKey(self::KEY_CURSOR));
     }
 
     /**

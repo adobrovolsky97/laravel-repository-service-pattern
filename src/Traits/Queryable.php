@@ -168,7 +168,12 @@ trait Queryable
      */
     public function getAllPaginated(array $search = [], int $pageSize = 15): LengthAwarePaginator
     {
-        return $this->applyFilters($search)->paginate($pageSize);
+        return $this->applyFilters($search)->paginate(
+            $pageSize,
+            ['*'],
+            'page',
+            $search['page'] ?? (request()?->input('page', 1) ?? 1)
+        );
     }
 
     /**
