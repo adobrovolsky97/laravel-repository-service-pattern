@@ -102,7 +102,7 @@ abstract class BaseCacheableRepository extends BaseRepository implements BaseCac
                         'withCount'           => $this->withCount,
                         'softDeleteQueryMode' => $this->softDeleteQueryMode,
                         'pageSize'            => $pageSize,
-                        'page'                => $page,
+                        'page'                => (int) $page,
                     ]
                 )
             ),
@@ -170,10 +170,15 @@ abstract class BaseCacheableRepository extends BaseRepository implements BaseCac
      */
     public function findOrFail($value, ?string $column = null): Model
     {
-        $model = parent::findOrFail($value, $column);
-        $this->cacheModel($model);
+        $keyData = is_null($column)
+            ? $this->generateCacheKeyForModelInstance($value)
+            : $this->generateCacheKeyForModelInstance("{$column}.{$value}");
 
-        return $model;
+        return $this->cacheDriver->remember(
+            $keyData,
+            $this->getTtl(),
+            fn() => parent::findOrFail($value, $column)
+        );
     }
 
     /**
@@ -311,11 +316,13 @@ abstract class BaseCacheableRepository extends BaseRepository implements BaseCac
     protected function generateCacheKey(string $keyName, array $params = []): array
     {
         ksort($params);
+        $alias = $this->cacheAlias ?? Str::camel(class_basename($this->getModelClass()));
+        $hash  = !empty($params) ? md5(serialize($params)) : '';
 
         return [
-            'tags'       => [$this->cacheAlias . '.' . $keyName],
-            'keyWithTag' => ($this->cacheAlias ?? Str::camel(last(explode('\\', $this->getModelClass())))) . '.' . $keyName . (!empty($params) ? '.' . md5(json_encode($params)) : ''),
-            'paramsKey'  => (!empty($params) ? md5(serialize($params)) : '')
+            'tags'       => ["$alias.$keyName"],
+            'keyWithTag' => "$alias.$keyName" . ($hash ? ".$hash" : ''),
+            'paramsKey'  => $hash,
         ];
     }
 
@@ -327,11 +334,19 @@ abstract class BaseCacheableRepository extends BaseRepository implements BaseCac
      */
     protected function generateCacheKeyForModelInstance($primaryKey): array
     {
-        $primaryKey = implode('.', Arr::wrap($primaryKey));
+        if (is_array($primaryKey)) {
+            ksort($primaryKey);
+            $primaryKey = implode('_', array_map(fn($k, $v) => "$k-$v", array_keys($primaryKey), $primaryKey));
+        } else {
+            $primaryKey = (string) $primaryKey;
+        }
+
+        $alias = $this->cacheAlias ?? Str::camel(class_basename($this->getModelClass()));
+
         return [
-            'tags'       => ["$this->cacheAlias.$primaryKey"],
-            'keyWithTag' => "$this->cacheAlias.$primaryKey",
-            'paramsKey'  => $primaryKey
+            'tags'       => ["$alias.model"],
+            'keyWithTag' => "$alias.$primaryKey",
+            'paramsKey'  => "$alias.$primaryKey",
         ];
     }
 
