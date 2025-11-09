@@ -6,7 +6,6 @@ use Closure;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\LazyCollection;
 use Adobrovolsky97\LaravelRepositoryServicePattern\Exceptions\Repository\RepositoryException;
 
@@ -62,21 +61,6 @@ abstract class BaseCacheDriver
         if (!empty($keyData['tags'])) {
             Cache::tags($keyData['tags'])->flush();
         }
-    }
-
-    /**
-     * Bulk put (pipeline optimization for mass caching)
-     */
-    public function putMany(array $items, int $ttl): void
-    {
-        Redis::pipeline(function ($pipe) use ($items, $ttl) {
-            foreach ($items as $keyData => $data) {
-                if ($this->isUnserializable($data)) {
-                    continue;
-                }
-                $pipe->setex($keyData, $ttl, serialize($data ?? self::NULL_SENTINEL));
-            }
-        });
     }
 
     /**
