@@ -285,8 +285,11 @@ trait Queryable
         }
 
         $conditions = $this->parseConditions($conditions);
-        $tableName = $query->getModel()->getTable();
-        $tableColumns = $this->getTableColumns($tableName);
+
+        if (!empty($conditions)) {
+            $tableName = $query->getModel()->getTable();
+            $tableColumns = $this->getTableColumns($tableName);
+        }
 
         foreach ($conditions as $data) {
 
