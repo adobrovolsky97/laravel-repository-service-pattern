@@ -1,4 +1,4 @@
-# Laravel 5.x - 11.x Repository-Service Pattern
+# Laravel 5.x+ Repository-Service Pattern
 
 The repository service pattern in Laravel is a widely used architectural pattern that provides a structured approach to accessing and managing data in an application. It serves as an intermediary layer between the application's business logic and the underlying data storage mechanism, such as a database.
 
