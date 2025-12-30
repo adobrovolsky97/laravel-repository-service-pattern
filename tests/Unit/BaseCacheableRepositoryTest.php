@@ -63,7 +63,9 @@ class BaseCacheableRepositoryTest extends TestCase
         $searchParams = [];
 
         $this->createModel(['prop_one' => 'one', 'prop_two' => 2]);
-        $collection = $this->repository->getAllPaginated($searchParams);
+
+        // The repository returns a LengthAwarePaginator object
+        $paginator = $this->repository->getAllPaginated($searchParams);
 
         $cacheKey = $this->repository->generateCacheKey(
             BaseCacheableRepository::KEY_PAGINATED,
@@ -73,11 +75,24 @@ class BaseCacheableRepositoryTest extends TestCase
             )
         );
 
-        $this->assertEquals($collection, $this->getCachedValue($cacheKey));
+        // The cache contains a raw array ['items' => Collection, 'total' => int]
+        $cachedData = $this->getCachedValue($cacheKey);
+
+        // 1. Verify cache structure
+        $this->assertIsArray($cachedData);
+        $this->assertArrayHasKey('items', $cachedData);
+        $this->assertArrayHasKey('total', $cachedData);
+
+        // 2. Verify data consistency between the returned object and the cache
+        $this->assertEquals($paginator->total(), $cachedData['total']);
+        $this->assertEquals($paginator->getCollection(), $cachedData['items']);
+
+        // --- Scenario with search params ---
 
         $searchParams = ['prop_one' => 'test'];
 
-        $collection = $this->repository->getAllPaginated($searchParams);
+        $paginatorWithParams = $this->repository->getAllPaginated($searchParams);
+
         $anotherCacheKey = $this->repository->generateCacheKey(
             BaseCacheableRepository::KEY_PAGINATED,
             array_merge(
@@ -86,7 +101,14 @@ class BaseCacheableRepositoryTest extends TestCase
             )
         );
 
-        $this->assertEquals($collection, $this->getCachedValue($anotherCacheKey));
+        $cachedDataWithParams = $this->getCachedValue($anotherCacheKey);
+
+        // Verify consistency again
+        $this->assertIsArray($cachedDataWithParams);
+        $this->assertEquals($paginatorWithParams->total(), $cachedDataWithParams['total']);
+        $this->assertEquals($paginatorWithParams->getCollection(), $cachedDataWithParams['items']);
+
+        // Ensure cache keys are different
         $this->assertNotEquals($cacheKey, $anotherCacheKey);
     }
 

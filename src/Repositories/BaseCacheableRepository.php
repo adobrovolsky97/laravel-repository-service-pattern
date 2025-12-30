@@ -6,6 +6,8 @@ use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Pagination\LengthAwarePaginator as Paginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
@@ -90,9 +92,10 @@ abstract class BaseCacheableRepository extends BaseRepository implements BaseCac
      */
     public function getAllPaginated(array $search = [], int $pageSize = 15): LengthAwarePaginator
     {
-        $page = $search['page'] ?? (request()?->input('page', 1) ?? 1);
+        $page = (int) ($search['page'] ?? request()?->input('page', 1));
 
-        return $this->cacheDriver->remember(
+        $cachedData = $this->cacheDriver->remember(
+
             $this->generateCacheKey(
                 self::KEY_PAGINATED,
                 array_merge(
@@ -102,15 +105,30 @@ abstract class BaseCacheableRepository extends BaseRepository implements BaseCac
                         'withCount'           => $this->withCount,
                         'softDeleteQueryMode' => $this->softDeleteQueryMode,
                         'pageSize'            => $pageSize,
-                        'page'                => (int) $page,
+                        'page'                => $page,
                     ]
                 )
             ),
             $this->getTtl(),
-            function () use ($search, $pageSize, $page) {
-                $search['page'] = $page;
-                return parent::getAllPaginated($search, $pageSize);
+            function () use ($search, $pageSize) {
+                $paginator = parent::getAllPaginated($search, $pageSize);
+
+                return [
+                    'items' => $paginator->getCollection(),
+                    'total' => $paginator->total(),
+                ];
             }
+        );
+
+        return new Paginator(
+            $cachedData['items'],
+            $cachedData['total'],
+            $pageSize,
+            $page,
+            [
+                'path' => request()->url(),
+                'query' => request()->query(),
+            ]
         );
     }
 
@@ -151,13 +169,19 @@ abstract class BaseCacheableRepository extends BaseRepository implements BaseCac
      */
     public function find($key): ?Model
     {
-        return $this->cacheDriver->remember(
+        $result = $this->cacheDriver->remember(
             $this->generateCacheKeyForModelInstance($key),
             $this->getTtl(),
             function () use ($key) {
                 return parent::find($key);
             }
         );
+
+        if ($result instanceof Model) {
+            return $result;
+        }
+
+        return null;
     }
 
     /**
@@ -170,15 +194,39 @@ abstract class BaseCacheableRepository extends BaseRepository implements BaseCac
      */
     public function findOrFail($value, ?string $column = null): Model
     {
-        $keyData = is_null($column)
-            ? $this->generateCacheKeyForModelInstance($value)
-            : $this->generateCacheKeyForModelInstance("{$column}.{$value}");
+        // Searching by PK
+        if ($column === null) {
+            $model = $this->find($value);
 
-        return $this->cacheDriver->remember(
-            $keyData,
+            if (!empty($model)) {
+                return $model;
+            }
+
+            throw (new ModelNotFoundException())->setModel($this->getModelClass(), $value);
+        }
+
+        $cacheKeyData = $this->generateCacheKeyForModelInstance("map.$column.$value");
+
+        // Caching ID
+        $id = $this->cacheDriver->remember(
+            $cacheKeyData,
             $this->getTtl(),
-            fn() => parent::findOrFail($value, $column)
+            function () use ($value, $column) {
+                return parent::findOrFail($value, $column)->getKey();
+            }
         );
+
+        // Now we have an ID and use $this->find to get the model from cache by ID
+        $model = $this->find($id);
+
+        // Edge case
+        if (!$model) {
+            $this->cacheDriver->forget($cacheKeyData);
+
+            throw (new ModelNotFoundException())->setModel($this->getModelClass(), $value);
+        }
+
+        return $model;
     }
 
     /**
@@ -221,12 +269,26 @@ abstract class BaseCacheableRepository extends BaseRepository implements BaseCac
      */
     public function update($keyOrModel, array $data): ?Model
     {
-        $model = parent::update($keyOrModel, $data);
+        $model = $this->resolveModel($keyOrModel);
 
-        $this->cacheModel($model);
+        $keysToForget = [];
+
+        foreach ($this->getUniqueKeys() as $field) {
+            if (array_key_exists($field, $data) && !empty($model->{$field}) && $data[$field] !== $model->{$field}) {
+                $keysToForget[] = "map.$field." . $model->{$field};
+            }
+        }
+
+        $updatedModel = parent::update($model, $data);
+
+        $this->cacheModel($updatedModel);
         $this->flushListsCaches();
 
-        return $model;
+        foreach ($keysToForget as $keyToRemove) {
+            $this->cacheDriver->forget($this->generateCacheKeyForModelInstance($keyToRemove));
+        }
+
+        return $updatedModel;
     }
 
     /**
@@ -366,6 +428,16 @@ abstract class BaseCacheableRepository extends BaseRepository implements BaseCac
         $model = $this->resolveModel($keyOrModel);
 
         $this->cacheDriver->put($this->generateCacheKeyForModelInstance($model->getKey()), $model, $this->getTtl());
+    }
+
+    /**
+     * Get unique keys for cache
+     *
+     * @return array
+     */
+    protected function getUniqueKeys(): array
+    {
+        return [];
     }
 
     /**
