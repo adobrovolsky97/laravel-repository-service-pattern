@@ -49,9 +49,9 @@ abstract class BaseRepository implements BaseRepositoryInterface
     {
         sort($ids);
 
-        return $this->model
+        return app($this->getModelClass())
             ->newQuery()
-            ->whereIn($this->model->getKeyName(), $ids)
+            ->whereKey($ids)
             ->lockForUpdate()
             ->get();
     }
@@ -64,9 +64,11 @@ abstract class BaseRepository implements BaseRepositoryInterface
      */
     public function lock(Model $model): Model
     {
-        if ($model->getTable() !== $this->model->getTable()) {
+        $repositoryModel = app($this->getModelClass());
+
+        if ($model->getTable() !== $repositoryModel->getTable()) {
             throw new InvalidArgumentException(
-                "Repository accepts models of type {$this->model->getTable()}, but " . $model->getTable() . " given."
+                "Repository accepts models of type {$repositoryModel->getTable()}, but " . $model->getTable() . " given."
             );
         }
 
