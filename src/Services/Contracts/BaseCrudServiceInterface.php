@@ -53,6 +53,19 @@ interface BaseCrudServiceInterface
     public function withoutTrashed(): BaseCrudServiceInterface;
 
     /**
+     * Lock model
+     */
+    public function lock(Model $model): Model;
+
+    /**
+     * Lock models by ids
+     *
+     * @param array $ids
+     * @return EloquentCollection
+     */
+    public function lockMany(array $ids): EloquentCollection;
+
+    /**
      * Get filtered results
      *
      * @param array $search

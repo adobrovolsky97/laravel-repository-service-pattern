@@ -97,6 +97,25 @@ abstract class BaseCrudService implements BaseCrudServiceInterface
     }
 
     /**
+     * Lock model
+     */
+    public function lock(Model $model): Model
+    {
+        return $this->repository->lock($model);
+    }
+
+    /**
+     * Lock models by ids
+     *
+     * @param array $ids
+     * @return EloquentCollection
+     */
+    public function lockMany(array $ids): EloquentCollection
+    {
+        return $this->repository->lockMany($ids);
+    }
+
+    /**
      * Get filtered results
      *
      * @param array $search
