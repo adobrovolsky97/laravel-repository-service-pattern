@@ -2,6 +2,7 @@
 
 namespace Adobrovolsky97\LaravelRepositoryServicePattern\Repositories;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Schema;
@@ -9,6 +10,7 @@ use Adobrovolsky97\LaravelRepositoryServicePattern\Exceptions\Repository\Reposit
 use Adobrovolsky97\LaravelRepositoryServicePattern\Repositories\Contracts\BaseRepositoryInterface;
 use Adobrovolsky97\LaravelRepositoryServicePattern\Traits\Crudable;
 use Adobrovolsky97\LaravelRepositoryServicePattern\Traits\Queryable;
+use InvalidArgumentException;
 
 /**
  * Class BaseRepository
@@ -35,6 +37,48 @@ abstract class BaseRepository implements BaseRepositoryInterface
         }
 
         return $this->withTrashed()->findOrFail($keyOrModel);
+    }
+
+    /**
+     * Lock models by ids
+     *
+     * @param array $ids
+     * @return Collection
+     */
+    public function lockMany(array $ids): Collection
+    {
+        sort($ids);
+
+        return $this->model
+            ->newQuery()
+            ->whereIn($this->model->getKeyName(), $ids)
+            ->lockForUpdate()
+            ->get();
+    }
+
+    /**
+     * Lock model
+     *
+     * @param Model $model
+     * @return Model
+     */
+    public function lock(Model $model): Model
+    {
+        if ($model->getTable() !== $this->model->getTable()) {
+            throw new InvalidArgumentException(
+                "Repository accepts models of type {$this->model->getTable()}, but " . $model->getTable() . " given."
+            );
+        }
+
+        $freshModel = $model->newQuery()
+            ->lockForUpdate()
+            ->findOrFail($model->getKey());
+
+        $model->setRawAttributes($freshModel->getAttributes(), true);
+        $model->setRelations($freshModel->getRelations());
+        $model->exists = $freshModel->exists;
+
+        return $model;
     }
 
     /**
