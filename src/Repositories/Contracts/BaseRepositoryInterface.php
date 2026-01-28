@@ -31,6 +31,31 @@ interface BaseRepositoryInterface
     public function insert(array $data): bool;
 
     /**
+     * Resolve model by key or return the model instance back
+     *
+     * @param $keyOrModel
+     * @return Model
+     * @throws RepositoryException
+     */
+    public function resolveModel($keyOrModel): Model;
+
+    /**
+     * Lock model
+     *
+     * @param Model $model
+     * @return Model
+     */
+    public function lock(Model $model): Model;
+
+    /**
+     * Lock models by ids
+     *
+     * @param array $ids
+     * @return Collection
+     */
+    public function lockMany(array $ids): Collection;
+
+    /**
      * Update model
      *
      * @param Model|mixed $keyOrModel
