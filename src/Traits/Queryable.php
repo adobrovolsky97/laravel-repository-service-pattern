@@ -3,6 +3,7 @@
 namespace Adobrovolsky97\LaravelRepositoryServicePattern\Traits;
 
 use Closure;
+use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -174,6 +175,19 @@ trait Queryable
             'page',
             $search['page'] ?? (request()?->input('page', 1) ?? 1)
         );
+    }
+
+    /**
+     * Get cursor paginated
+     *
+     * @param array $search
+     * @param int $pageSize
+     * @return CursorPaginator
+     * @throws RepositoryException
+     */
+    public function getCursorPaginated(array $search = [], int $pageSize = 15): CursorPaginator
+    {
+        return $this->applyFilters($search)->cursorPaginate($pageSize);
     }
 
     /**

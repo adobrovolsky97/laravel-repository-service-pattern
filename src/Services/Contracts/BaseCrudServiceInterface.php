@@ -3,6 +3,7 @@
 namespace Adobrovolsky97\LaravelRepositoryServicePattern\Services\Contracts;
 
 use Exception;
+use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
@@ -73,6 +74,15 @@ interface BaseCrudServiceInterface
      * @return LengthAwarePaginator
      */
     public function getAllPaginated(array $search = [], int $pageSize = 15): LengthAwarePaginator;
+
+    /**
+     * Get cursor paginated
+     *
+     * @param array $search
+     * @param int $pageSize
+     * @return CursorPaginator
+     */
+    public function getCursorPaginated(array $search = [], int $pageSize = 15): CursorPaginator;
 
     /**
      * Get all records as collection
