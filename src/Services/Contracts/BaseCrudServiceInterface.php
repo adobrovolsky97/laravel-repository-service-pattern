@@ -128,9 +128,9 @@ interface BaseCrudServiceInterface
      * Create model
      *
      * @param array $data
-     * @return Model|null
+     * @return Model
      */
-    public function create(array $data): ?Model;
+    public function create(array $data): Model;
 
     /**
      * Create many models

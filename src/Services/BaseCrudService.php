@@ -16,6 +16,7 @@ use Adobrovolsky97\LaravelRepositoryServicePattern\Repositories\Contracts\BaseRe
 use Adobrovolsky97\LaravelRepositoryServicePattern\Services\Contracts\BaseCrudServiceInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Throwable;
 
 /**
  * Class BaseCrudService
@@ -204,10 +205,10 @@ abstract class BaseCrudService implements BaseCrudServiceInterface
      * Create model
      *
      * @param array $data
-     * @return Model|null
+     * @return Model
      * @throws ServiceException
      */
-    public function create(array $data): ?Model
+    public function create(array $data): Model
     {
         if (is_null($model = $this->repository->create($data))) {
             throw new ServiceException('Error while creating model');
@@ -233,6 +234,7 @@ abstract class BaseCrudService implements BaseCrudServiceInterface
      * @param array $attributes
      * @return Collection
      * @throws ServiceException
+     * @throws Throwable
      */
     public function createMany(array $attributes): Collection
     {
